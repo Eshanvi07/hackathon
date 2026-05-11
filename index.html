@@ -216,20 +216,45 @@ QA, FM, BT, HX, DP, AK, RC, LM, ZF, KN, PE, CU, SJ, VG
       return order;
     }
 
-    // Sample dependencies for Level 2
+    // Real Dependency Matrix Converted into Dependency Pairs
+    // Format: [Station, DependsOn]
     const dependencyPairs = [
-      ['FM', 'AK'],
-      ['BT', 'FM'],
-      ['HX', 'BT'],
+      ['AK', 'RC'],
+      ['AK', 'BT'],
+
+      ['QA', 'PE'],
+      ['QA', 'CU'],
+
+      ['FM', 'PE'],
+      ['FM', 'LM'],
+
       ['DP', 'AK'],
-      ['RC', 'DP'],
-      ['LM', 'RC'],
-      ['ZF', 'LM'],
-      ['KN', 'FM'],
-      ['PE', 'KN'],
-      ['CU', 'PE'],
-      ['SJ', 'CU'],
-      ['VG', 'SJ']
+      ['DP', 'FM'],
+
+      ['RC', 'QA'],
+      ['RC', 'BT'],
+
+      ['PE', 'CU'],
+      ['PE', 'LM'],
+
+      ['BT', 'FM'],
+      ['BT', 'KN'],
+
+      ['CU', 'LM'],
+      ['CU', 'SJ'],
+
+      ['LM', 'KN'],
+      ['LM', 'VG'],
+
+      ['KN', 'SJ'],
+      ['KN', 'HX'],
+
+      ['SJ', 'VG'],
+      ['SJ', 'ZF'],
+
+      ['VG', 'HX'],
+
+      ['HX', 'ZF']
     ];
 
     // Extend output with Level 2

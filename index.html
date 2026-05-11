@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Station Ordering & Disorder Analysis</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 900px;
+      background: #1e293b;
+      padding: 24px;
+      border-radius: 18px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    }
+
+    h1 {
+      text-align: center;
+      color: #38bdf8;
+      margin-bottom: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 80px;
+      border-radius: 10px;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      resize: none;
+      margin-bottom: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #38bdf8;
+      color: black;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #0ea5e9;
+    }
+
+    .result {
+      margin-top: 24px;
+      background: #334155;
+      padding: 16px;
+      border-radius: 12px;
+      line-height: 1.8;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    th, td {
+      border: 1px solid #64748b;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background: #475569;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Station Ordering & Disorder Analysis</h1>
+
+    <textarea id="input">
+QA, FM, BT, HX, DP, AK, RC, LM, ZF, KN, PE, CU, SJ, VG
+    </textarea>
+
+    <button onclick="analyzeStations()">Analyze Stations</button>
+
+    <div class="result" id="output"></div>
+  </div>
+
+  <script>
+    function stationValue(id) {
+      return id.charCodeAt(0) + id.charCodeAt(1);
+    }
+
+    function mergeAndCount(arr) {
+      if (arr.length <= 1) return { arr, count: 0 };
+
+      const mid = Math.floor(arr.length / 2);
+      const left = mergeAndCount(arr.slice(0, mid));
+      const right = mergeAndCount(arr.slice(mid));
+
+      let merged = [];
+      let i = 0, j = 0, inversions = left.count + right.count;
+
+      while (i < left.arr.length && j < right.arr.length) {
+        if (left.arr[i].value <= right.arr[j].value) {
+          merged.push(left.arr[i++]);
+        } else {
+          merged.push(right.arr[j++]);
+          inversions += left.arr.length - i;
+        }
+      }
+
+      return {
+        arr: merged
+          .concat(left.arr.slice(i))
+          .concat(right.arr.slice(j)),
+        count: inversions
+      };
+    }
+
+    function analyzeStations() {
+      const raw = document.getElementById('input').value;
+
+      const stations = raw
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean)
+        .map(id => ({
+          id,
+          value: stationValue(id)
+        }));
+
+      const sortedData = mergeAndCount(stations);
+
+      let html = `
+        <h2>Computed Station Values</h2>
+        <table>
+          <tr>
+            <th>Station</th>
+            <th>Signal Value</th>
+          </tr>
+      `;
+
+      stations.forEach(s => {
+        html += `
+          <tr>
+            <td>${s.id}</td>
+            <td>${s.value}</td>
+          </tr>
+        `;
+      });
+
+      html += `</table>`;
+
+      html += `
+        <h2>Sorted Station Order</h2>
+        <p>${sortedData.arr.map(s => `${s.id} (${s.value})`).join(' → ')}</p>
+      `;
+
+      html += `
+        <h2>Disorder Analysis</h2>
+        <p><strong>Inversion Count:</strong> ${sortedData.count}</p>
+      `;
+
+      document.getElementById('output').innerHTML = html;
+    }
+
+    analyzeStations();
+  </script>
+</body>
+</html>

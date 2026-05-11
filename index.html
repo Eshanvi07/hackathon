@@ -178,5 +178,100 @@ QA, FM, BT, HX, DP, AK, RC, LM, ZF, KN, PE, CU, SJ, VG
 
     analyzeStations();
   </script>
+  <script>
+    // LEVEL 2 - Dependency Resolution (Topological Sort)
+    function topologicalSort(nodes, dependencies) {
+      const graph = {};
+      const indegree = {};
+
+      nodes.forEach(n => {
+        graph[n] = [];
+        indegree[n] = 0;
+      });
+
+      dependencies.forEach(([from, to]) => {
+        graph[to].push(from);
+        indegree[from]++;
+      });
+
+      const queue = [];
+      for (let node in indegree) {
+        if (indegree[node] === 0) queue.push(node);
+      }
+
+      const order = [];
+
+      while (queue.length) {
+        const current = queue.shift();
+        order.push(current);
+
+        graph[current].forEach(neighbor => {
+          indegree[neighbor]--;
+          if (indegree[neighbor] === 0) {
+            queue.push(neighbor);
+          }
+        });
+      }
+
+      return order;
+    }
+
+    // Sample dependencies for Level 2
+    const dependencyPairs = [
+      ['FM', 'AK'],
+      ['BT', 'FM'],
+      ['HX', 'BT'],
+      ['DP', 'AK'],
+      ['RC', 'DP'],
+      ['LM', 'RC'],
+      ['ZF', 'LM'],
+      ['KN', 'FM'],
+      ['PE', 'KN'],
+      ['CU', 'PE'],
+      ['SJ', 'CU'],
+      ['VG', 'SJ']
+    ];
+
+    // Extend output with Level 2
+    const oldAnalyze = analyzeStations;
+
+    analyzeStations = function() {
+      oldAnalyze();
+
+      const raw = document.getElementById('input').value;
+      const stations = raw
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      const activationOrder = topologicalSort(stations, dependencyPairs);
+
+      let level2HTML = `
+        <h2>Level 2 - Dependency Resolution</h2>
+        <p><strong>Activation Sequence:</strong></p>
+        <p>${activationOrder.join(' → ')}</p>
+
+        <h3>Dependency Rules</h3>
+        <table>
+          <tr>
+            <th>Station</th>
+            <th>Depends On</th>
+          </tr>
+      `;
+
+      dependencyPairs.forEach(dep => {
+        level2HTML += `
+          <tr>
+            <td>${dep[0]}</td>
+            <td>${dep[1]}</td>
+          </tr>
+        `;
+      });
+
+      level2HTML += `</table>`;
+
+      document.getElementById('output').innerHTML += level2HTML;
+    }
+  </script>
 </body>
 </html>
